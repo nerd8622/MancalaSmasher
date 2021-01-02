@@ -1,4 +1,7 @@
 from Game import Game
 
 game = Game()
-print(game)
+
+while not game.gameWon:
+    print(game)
+    game.move(int(input("Move: ")))

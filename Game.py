@@ -20,31 +20,33 @@ class Game:
         dropper = column
         side = self.turn
 
-        if self.avalanche:
-            # avalanche move
-            pass
-        else:
-            while marbles:
+        while marbles:
+            dropper += (1 if side else -1)
+            if (dropper < 0) or (dropper > 5):  # check for out of bounds
+                if self.turn == side:
+                    self.scores[self.turn] += 1
+                    marbles -= 1
+                    if not marbles:
+                        break
+                side = ~side
                 dropper += (1 if side else -1)
-                if (dropper < 0) or (dropper > 5):  # check for out of bounds
-                    if self.turn == side:
-                        self.scores[self.turn] += 1
-                        marbles -= 1
-                        if not marbles:
-                            break
-                    side = ~side
-                    dropper += (1 if side else -1)
-                self.board[side, dropper] += 1
-                marbles -= 1
+            self.board[side, dropper] += 1
+            marbles -= 1
 
         if (dropper < 0) or (dropper > 5):
             pass  # player lands in goal and gets another turn
         else:
-            if (self.turn == side) and (self.board[side, dropper] == 1):
+            if self.board[side, dropper] > 1 and self.avalanche:
+                pass  # implement avalanche
+            elif (self.turn == side) and (self.board[side, dropper] == 1):
                 if self.board[~side, dropper]:
                     self.scores[self.turn] += self.board[~side, dropper] + 1
                     self.board[side, dropper] = self.board[~side, dropper] = 0
             self.turn = ~self.turn
 
     def possibleMoves(self):
-        pass
+        return np.nonzero(self.board[self.turn])
+
+    @property
+    def gameWon(self):
+        return np.sum(self.board) == 0
